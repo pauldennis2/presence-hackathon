@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Presence Hackathon Admin</title>
+</head>
+<body>
+<form action="/add-event" method="post">
+    <input type="text" placeholder="Event name" name="eventName"/>
+    <input type="text" placeholder="Event location" name="eventLocation"/>
+    <input type="text" placeholder="Event address" name="eventAddress"/>
+    <input type="date" name="eventDate"/>
+    <input type="time" name="eventTime"/>
+    <button type="submit">Add Event</button>
+</form>
+<hr>
+<b>List of Events:</b><br>
+{{#eventList}}
+    Event: {{eventName}}
+    <br>
+{{/eventList}}
+</body>
+</html>
