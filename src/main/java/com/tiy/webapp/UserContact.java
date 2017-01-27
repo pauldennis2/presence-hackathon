@@ -1,10 +1,18 @@
 package com.tiy.webapp;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
  * Created by Paul Dennis on 1/25/2017.
  */
+
+@Entity
+@Table(name = "contacts")
 public class UserContact {
 
+    @Id
     int requestId;
     String requesterEmail;
     String requesteeEmail;

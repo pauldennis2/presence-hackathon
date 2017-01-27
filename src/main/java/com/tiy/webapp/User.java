@@ -9,9 +9,6 @@ import javax.persistence.*;
 @Table(name = "users")
 public class User {
 
-    @ManyToOne
-    Event currentEvent;
-
     @Id
     String email;
 
@@ -30,8 +27,11 @@ public class User {
     @Column(nullable = false)
     String password;
 
-    @Column(nullable = false)
-    String photo;
+    @Column(nullable = true)
+    Integer eventId;
+
+    //@Column(nullable = false)
+    //ImageString imageString;
 
     public User () {
 
@@ -42,12 +42,21 @@ public class User {
         this.password = password;
     }
 
-    public Event getCurrentEvent() {
-        return currentEvent;
+    public User(String email, String firstName, String lastName, String company, String position, String password) {
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.company = company;
+        this.position = position;
+        this.password = password;
     }
 
-    public void setCurrentEvent(Event currentEvent) {
-        this.currentEvent = currentEvent;
+    public Integer getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(Integer eventId) {
+        this.eventId = eventId;
     }
 
     public String getFirstName() {
@@ -98,11 +107,4 @@ public class User {
         this.password = password;
     }
 
-    public String getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(String photo) {
-        this.photo = photo;
-    }
 }

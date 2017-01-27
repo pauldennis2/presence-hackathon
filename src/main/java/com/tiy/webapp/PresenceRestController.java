@@ -1,5 +1,6 @@
 package com.tiy.webapp;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,17 +21,28 @@ public class PresenceRestController {
 
     int nextRequestId;
 
+    @Autowired
+    UserRepo userRepo;
+
+    @Autowired
+    EventRepo eventRepo;
+
     //POC Endpoints
     //tested in postman
     @RequestMapping(path = "/user-login.json", method = RequestMethod.POST)
-    public boolean userLogin (@RequestBody UserLoginRequest userLoginRequest) {
+    public Response userLogin (@RequestBody UserLoginRequest userLoginRequest) {
         initialize();
+        if (userRepo == null) {
+            System.out.println("User repo is null");
+        } else {
+            System.out.println("User repo active!");
+        }
         String email = userLoginRequest.getEmail();
         User user = userMap.get(email);
         if (user != null && user.getPassword().equals(userLoginRequest.getPassword())) {
-            return true;
+            return new Response(true);
         }
-        return false;
+        return new Response(false);
     }
 
     //tested in postman
@@ -47,29 +59,31 @@ public class PresenceRestController {
         User user = userMap.get(dumbWrapper.getEmail());
         System.out.println(user);
         if (user != null) {
-            return user.getCurrentEvent();
+            throw new AssertionError("Fix");
+            //return user.getCurrentEvent();
         }
         return null;
     }
 
     //tested in postman
     @RequestMapping(path = "/user-event-signup.json", method = RequestMethod.POST)
-    public boolean userEventSignup (@RequestBody EventSignupRequest eventSignupRequest) {
+    public Response userEventSignup (@RequestBody EventSignupRequest eventSignupRequest) {
         initialize();
         String email = eventSignupRequest.getEmail();
         int eventId = eventSignupRequest.getEventId();
         User user = userMap.get(email);
         Event event = eventMap.get(eventId);
         if (user != null && event != null) {
-            user.setCurrentEvent(event);
-            return true;
+            throw new AssertionError("Fix");
+            //user.setCurrentEvent(event);
+            //return true;
         }
-        return false;
+        return new Response(false);
     }
 
     //tested in postman
     @RequestMapping(path = "/respond-to-request.json", method = RequestMethod.POST)
-    public boolean respondToRequest (@RequestBody ContactResponseRequest contactResponseRequest) {
+    public Response respondToRequest (@RequestBody ContactResponseRequest contactResponseRequest) {
         initialize();
         //String email = contactResponseRequest.getEmail();
         int requestId = contactResponseRequest.getRequestId();
@@ -77,37 +91,37 @@ public class PresenceRestController {
 
         UserContact contact = contactRequestMap.get(requestId);
         if (contact == null) {
-            return false;
+            return new Response(false);
         }
         //Do stuff
         if (accept) {
             contact.setAccepted(true);
-            return true;
+            return new Response(true);
         } else {
             contactRequestMap.remove(requestId);
-            return true;
+            return new Response(true);
         }
     }
 
     //tested in postman
     @RequestMapping(path = "/send-request.json", method = RequestMethod.POST)
-    public boolean sendRequest (@RequestBody UserContact userContact) {
+    public Response sendRequest (@RequestBody UserContact userContact) {
         initialize();
         String requesterEmail = userContact.getRequesterEmail();
         String requesteeEmail = userContact.getRequesteeEmail();
         User user1 = userMap.get(requesterEmail);
         User user2 = userMap.get(requesteeEmail);
         if (user1 == null || user2 == null) {
-            return false;
+            return new Response(false);
         }
         if (user1.equals(user2)) {
-            return false;
+            return new Response(false);
         }
 
         userContact.setRequestId(nextRequestId);
         contactRequestMap.put(nextRequestId, userContact);
         nextRequestId++;
-        return true;
+        return new Response(true);
     }
 
 
@@ -121,7 +135,7 @@ public class PresenceRestController {
         }
         List<User> attendees = new ArrayList<>();
         for (User user : userMap.values()) {
-            if (user.getCurrentEvent().getEventId() == eventId) {
+            if (user.getEventId() == eventId) {
                 attendees.add(user);
             }
         }
@@ -175,8 +189,8 @@ public class PresenceRestController {
     public void initialize () {
         if (!initialized) {
             eventMap = new HashMap<>();
-            Event testEvent = new Event(0, "Test Event", "Iron Yard Atlanta", "MLK", "Today", "5oclock");
-            Event otherEvent = new Event(1, "Big Luau", "Hawaii", "Kawaii(SP?)", "Tomorrow", "Sunset");
+            Event testEvent = new Event(0, "Test Event", "Iron Yard Atlanta", "MLK");
+            Event otherEvent = new Event(1, "Big Luau", "Hawaii", "Oahu");
             eventMap.put(testEvent.getEventId(), testEvent);
             eventMap.put(otherEvent.getEventId(), otherEvent);
 

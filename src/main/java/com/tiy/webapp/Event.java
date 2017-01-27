@@ -1,6 +1,8 @@
 package com.tiy.webapp;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
  * Created by Paul Dennis on 1/25/2017.
@@ -23,22 +25,25 @@ public class Event {
     String address;
 
     @Column(nullable = false)
-    String date;
-
-    @Column(nullable = false)
-    String time;
+    Timestamp dateTime;
 
     public Event () {
 
     }
 
-    public Event(int eventId, String eventName, String location, String address, String date, String time) {
+    public Event(int eventId, String eventName, String location, String address) {
         this.eventId = eventId;
         this.eventName = eventName;
         this.location = location;
         this.address = address;
-        this.date = date;
-        this.time = time;
+        dateTime = Timestamp.valueOf(LocalDateTime.now());
+    }
+
+    public Event(String eventName, String location, String address) {
+        this.eventName = eventName;
+        this.location = location;
+        this.address = address;
+        dateTime = Timestamp.valueOf(LocalDateTime.now());
     }
 
     public int getEventId() {
@@ -73,19 +78,11 @@ public class Event {
         this.address = address;
     }
 
-    public String getDate() {
-        return date;
+    public Timestamp getDateTime() {
+        return dateTime;
     }
 
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
+    public void setDateTime(Timestamp dateTime) {
+        this.dateTime = dateTime;
     }
 }
