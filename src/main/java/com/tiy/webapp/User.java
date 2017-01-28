@@ -1,6 +1,7 @@
 package com.tiy.webapp;
 
 import javax.persistence.*;
+import java.util.Set;
 
 /**
  * Created by Paul Dennis on 1/25/2017.
@@ -34,8 +35,17 @@ public class User {
     @Column(nullable = true)
     Long checkedInEventId;
 
-    //@Column(nullable = false)
-    //ImageString imageString;
+    @ManyToMany
+    @JoinTable (
+            name = "user_events",
+            joinColumns = @JoinColumn(name="user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "event_id", referencedColumnName = "id")
+    )
+    Set<Event> events;
+
+    @Column(nullable = true)
+    @Lob
+    String imageString;
 
     public User () {
 
@@ -69,6 +79,11 @@ public class User {
 
     public void setCheckedInEventId(Long checkedInEventId) {
         this.checkedInEventId = checkedInEventId;
+    }
+
+    public void eventCheckIn (Event event) {
+        setCheckedInEventId(event.getId());
+        events.add(event);
     }
 
     public String getFirstName() {

@@ -8,8 +8,31 @@ import javax.persistence.Lob;
  */
 public class ImageString {
 
-    @Column(nullable = true)
-    @Lob
-    String imageString;
 
+    String imageString;
+    String fileName;
+
+    public ImageString() {
+    }
+
+    public ImageString(String imageString, String fileName) {
+        this.imageString = imageString;
+        this.fileName = fileName;
+    }
+
+    public String getImageString() {
+        return imageString;
+    }
+
+    public void setImageString(String imageString) {
+        this.imageString = imageString;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 }
