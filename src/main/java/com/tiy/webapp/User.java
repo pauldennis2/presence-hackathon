@@ -9,7 +9,11 @@ import javax.persistence.*;
 @Table(name = "users")
 public class User {
 
+    @GeneratedValue
     @Id
+    Long id;
+
+    @Column(nullable = false, unique = true)
     String email;
 
     @Column(nullable = false)
@@ -28,7 +32,7 @@ public class User {
     String password;
 
     @Column(nullable = true)
-    Integer eventId;
+    Long checkedInEventId;
 
     //@Column(nullable = false)
     //ImageString imageString;
@@ -51,12 +55,20 @@ public class User {
         this.password = password;
     }
 
-    public Integer getEventId() {
-        return eventId;
+    public Long getId() {
+        return id;
     }
 
-    public void setEventId(Integer eventId) {
-        this.eventId = eventId;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getCheckedInEventId() {
+        return checkedInEventId;
+    }
+
+    public void setCheckedInEventId(Long checkedInEventId) {
+        this.checkedInEventId = checkedInEventId;
     }
 
     public String getFirstName() {

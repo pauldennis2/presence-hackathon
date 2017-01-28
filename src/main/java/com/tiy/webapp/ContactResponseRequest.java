@@ -7,7 +7,7 @@ package com.tiy.webapp;
 public class ContactResponseRequest {
 
     String email;
-    int requestId;
+    Long requestId;
     boolean accept;
 
     public ContactResponseRequest () {
@@ -22,11 +22,11 @@ public class ContactResponseRequest {
         this.email = email;
     }
 
-    public int getRequestId() {
+    public Long getRequestId() {
         return requestId;
     }
 
-    public void setRequestId(int requestId) {
+    public void setRequestId(Long requestId) {
         this.requestId = requestId;
     }
 

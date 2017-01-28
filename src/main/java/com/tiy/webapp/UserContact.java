@@ -1,8 +1,8 @@
 package com.tiy.webapp;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
  * Created by Paul Dennis on 1/25/2017.
@@ -12,34 +12,66 @@ import javax.persistence.Table;
 @Table(name = "contacts")
 public class UserContact {
 
+    @GeneratedValue
     @Id
-    int requestId;
+    Long id;
+
+    @Column(nullable = false)
     String requesterEmail;
+
+    @Column(nullable = false)
     String requesteeEmail;
 
-    boolean accepted;
-    boolean blocked;
+    @Column(nullable = false)
+    ContactStatus status;
 
-    //LocalDateTime dateTime;
+    @Column(nullable = false)
+    Timestamp originalRequestTime;
+
+    @Column(nullable = true)
+    Timestamp refreshRequestTime;
 
     public UserContact() {
-
+        originalRequestTime = Timestamp.valueOf(LocalDateTime.now());
     }
 
-    public int getRequestId() {
-        return requestId;
+    public UserContact(String requesterEmail, String requesteeEmail, ContactStatus status) {
+        this.requesterEmail = requesterEmail;
+        this.requesteeEmail = requesteeEmail;
+        this.status = status;
+        originalRequestTime = Timestamp.valueOf(LocalDateTime.now());
     }
 
-    public void setRequestId(int requestId) {
-        this.requestId = requestId;
+    public Long getId() {
+        return id;
     }
 
-    public boolean isAccepted() {
-        return accepted;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public void setAccepted(boolean accepted) {
-        this.accepted = accepted;
+    public ContactStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ContactStatus status) {
+        this.status = status;
+    }
+
+    public Timestamp getOriginalRequestTime() {
+        return originalRequestTime;
+    }
+
+    public void setOriginalRequestTime(Timestamp originalRequestTime) {
+        this.originalRequestTime = originalRequestTime;
+    }
+
+    public Timestamp getRefreshRequestTime() {
+        return refreshRequestTime;
+    }
+
+    public void setRefreshRequestTime(Timestamp refreshRequestTime) {
+        this.refreshRequestTime = refreshRequestTime;
     }
 
     public String getRequesterEmail() {

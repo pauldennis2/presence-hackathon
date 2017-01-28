@@ -13,7 +13,7 @@ public class Event {
 
     @Id
     @GeneratedValue
-    int eventId;
+    Long id;
 
     @Column(nullable = false)
     String eventName;
@@ -31,8 +31,8 @@ public class Event {
 
     }
 
-    public Event(int eventId, String eventName, String location, String address) {
-        this.eventId = eventId;
+    public Event(Long id, String eventName, String location, String address) {
+        this.id = id;
         this.eventName = eventName;
         this.location = location;
         this.address = address;
@@ -46,12 +46,12 @@ public class Event {
         dateTime = Timestamp.valueOf(LocalDateTime.now());
     }
 
-    public int getEventId() {
-        return eventId;
+    public Long getId() {
+        return id;
     }
 
-    public void setEventId(int eventId) {
-        this.eventId = eventId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getEventName() {

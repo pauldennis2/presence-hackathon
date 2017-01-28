@@ -8,5 +8,6 @@ import java.util.List;
 /**
  * Created by Paul Dennis on 1/26/2017.
  */
-public interface EventRepo extends CrudRepository<Event, Integer> {
+public interface EventRepo extends CrudRepository<Event, Long> {
+    Event findFirstByEventName(String eventName);
 }

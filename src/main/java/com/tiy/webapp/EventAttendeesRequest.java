@@ -5,17 +5,17 @@ package com.tiy.webapp;
  */
 public class EventAttendeesRequest {
 
-    int eventId;
+    Long eventId;
 
     public EventAttendeesRequest () {
 
     }
 
-    public int getEventId() {
+    public Long getEventId() {
         return eventId;
     }
 
-    public void setEventId(int eventId) {
+    public void setEventId(Long eventId) {
         this.eventId = eventId;
     }
 }

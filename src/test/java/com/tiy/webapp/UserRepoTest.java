@@ -3,13 +3,21 @@ package com.tiy.webapp;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 import static org.junit.Assert.*;
 
 /**
  * Created by Paul Dennis on 1/27/2017.
  */
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class UserRepoTest {
 
     @Autowired
@@ -31,9 +39,9 @@ public class UserRepoTest {
     }
 
     @Test
-    public void testBasicUserInsertRetrieval () {
-        User firstSavedUser = userRepo.save(firstTestUser);
-        User secondSavedUser = userRepo.save(secondTestUser);
+    public void testBasicUserCrud () {
+        userRepo.save(firstTestUser);
+        userRepo.save(secondTestUser);
 
         User firstRetrievedUser = userRepo.findFirstByEmail(firstTestUser.getEmail());
         assertNotNull(firstRetrievedUser);
@@ -49,6 +57,35 @@ public class UserRepoTest {
         assertNull(firstNullUser);
         User secondNullUser = userRepo.findFirstByEmail(secondTestUser.getEmail());
         assertNull(secondNullUser);
+    }
+
+    @Test
+    public void testFindByEventId () {
+        secondTestUser.setCheckedInEventId(new Long(5));
+        User thirdTestUser = new User("gobble@turkey", "1234", "GM", "CTO", "IPA", "DBA");
+        thirdTestUser.setCheckedInEventId(new Long(5));
+        userRepo.save(thirdTestUser);
+        userRepo.save(firstTestUser);
+        userRepo.save(secondTestUser);
+
+        List<User> attendees = userRepo.findByCheckedInEventId(new Long(5));
+        assertEquals(2, attendees.size());
+        String name = attendees.get(0).getFirstName();
+
+        if (!name.equals("1234") || name.equals("Carth")) {
+            assertTrue(false);
+        }
+
+        userRepo.delete(firstTestUser);
+        userRepo.delete(secondTestUser);
+        userRepo.delete(thirdTestUser);
+
+        User firstNullUser = userRepo.findFirstByEmail(firstTestUser.getEmail());
+        assertNull(firstNullUser);
+        User secondNullUser = userRepo.findFirstByEmail(secondTestUser.getEmail());
+        assertNull(secondNullUser);
+        User thirdNullUser = userRepo.findFirstByEmail(thirdTestUser.getEmail());
+        assertNull(thirdNullUser);
     }
 
 }

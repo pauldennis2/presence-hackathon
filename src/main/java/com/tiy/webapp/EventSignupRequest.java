@@ -6,7 +6,7 @@ package com.tiy.webapp;
 public class EventSignupRequest {
 
     String email;
-    int eventId;
+    Long eventId;
 
     public EventSignupRequest () {
 
@@ -20,11 +20,11 @@ public class EventSignupRequest {
         this.email = email;
     }
 
-    public int getEventId() {
+    public Long getEventId() {
         return eventId;
     }
 
-    public void setEventId(int eventId) {
+    public void setEventId(Long eventId) {
         this.eventId = eventId;
     }
 }
