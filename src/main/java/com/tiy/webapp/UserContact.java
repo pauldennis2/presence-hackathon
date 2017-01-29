@@ -28,7 +28,7 @@ public class UserContact {
     @Id
     Long id;
 
-    @ManyToOne(cascade=CascadeType.REMOVE)
+    @ManyToOne(cascade=CascadeType.MERGE)
     //@JoinColumn(name = "requester_id", nullable = false)
     User requester;
 

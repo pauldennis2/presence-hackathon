@@ -35,7 +35,7 @@ public class User {
     @Column(nullable = true)
     Long checkedInEventId;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade=CascadeType.MERGE, mappedBy="requester")
+    @OneToMany(fetch = FetchType.EAGER, cascade=CascadeType.MERGE, orphanRemoval = true, mappedBy="requester")
     Set<UserContact> userContactSet;
 
     @ManyToMany

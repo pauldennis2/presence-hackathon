@@ -121,10 +121,9 @@ public class UserRepoTest {
         assertNotNull(retrievedUser);
         assertEquals(2, retrievedUser.getUserContactSet().size());
 
-
         contacts.delete(firstContact);
         contacts.delete(secondContact);
-        //users.delete(firstTestUser);
+        users.delete(firstTestUser);
     }
 
 }
