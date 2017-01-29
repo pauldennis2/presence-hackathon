@@ -44,7 +44,7 @@ public class EventRepoTest {
         assertNotNull(retrievedEvent);
         assertNotNull(otherRetrievedEvent);
         assertEquals(testEvent.getAddress(), retrievedEvent.getAddress());
-        assertEquals(otherEvent.getDateTime(), otherRetrievedEvent.getDateTime());
+        assertEquals(otherEvent.getStartTime(), otherRetrievedEvent.getStartTime());
         assertEquals(otherEvent.getAddress(), otherRetrievedEvent.getAddress());
 
         eventRepo.delete(id);

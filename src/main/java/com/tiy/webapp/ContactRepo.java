@@ -13,5 +13,5 @@ public interface ContactRepo extends CrudRepository<UserContact, Long> {
     List<UserContact> findByRequesterEmailAndStatus (String requesterEmail, ContactStatus status);
     //List<UserContact> findByRequesteeEmailAndStatus (String requesteeEmail, ContactStatus status);
 
-
+    //List<UserContact> findByRequesterOrRequesteeAndStatus (User user, ContactStatus status);
 }

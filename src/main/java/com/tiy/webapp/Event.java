@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 @Table(name = "events")
 public class Event {
 
+    public static long MILLIS_TO_HOURS = 3600000;
+
     @Id
     @GeneratedValue
     Long id;
@@ -25,7 +27,10 @@ public class Event {
     String address;
 
     @Column(nullable = false)
-    Timestamp dateTime;
+    Timestamp startTime;
+
+    @Column(nullable = false)
+    Timestamp endTime;
 
     public Event () {
 
@@ -36,14 +41,14 @@ public class Event {
         this.eventName = eventName;
         this.location = location;
         this.address = address;
-        dateTime = Timestamp.valueOf(LocalDateTime.now());
+        startTime = Timestamp.valueOf(LocalDateTime.now());
     }
 
     public Event(String eventName, String location, String address) {
         this.eventName = eventName;
         this.location = location;
         this.address = address;
-        dateTime = Timestamp.valueOf(LocalDateTime.now());
+        startTime = Timestamp.valueOf(LocalDateTime.now());
     }
 
     public Long getId() {
@@ -78,11 +83,29 @@ public class Event {
         this.address = address;
     }
 
-    public Timestamp getDateTime() {
-        return dateTime;
+    public Timestamp getStartTime() {
+        return startTime;
     }
 
-    public void setDateTime(Timestamp dateTime) {
-        this.dateTime = dateTime;
+    public void setStartTime(Timestamp startTime) {
+        this.startTime = startTime;
+    }
+
+    public Timestamp getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Timestamp endTime) {
+        this.endTime = endTime;
+    }
+
+    /**
+     *
+     * @return true if the current time is within an hour of the event's start time or end time.
+     */
+    public boolean isCurrent () {
+        Timestamp now = Timestamp.valueOf(LocalDateTime.now());
+        //if (now.after(this.endTime))
+        return false;
     }
 }

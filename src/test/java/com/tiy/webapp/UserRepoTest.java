@@ -93,7 +93,7 @@ public class UserRepoTest {
         User thirdNullUser = users.findFirstByEmail(thirdTestUser.getEmail());
         assertNull(thirdNullUser);
     }
-
+    /*
     @Test
     public void testOtherthing () {
         users.save(firstTestUser);
@@ -103,7 +103,7 @@ public class UserRepoTest {
         firstContact.setStatus(ContactStatus.FRIENDS);
         firstContact.setOriginalRequestTime(Timestamp.valueOf(LocalDateTime.now()));
         contacts.save(firstContact);
-
+        //todo rewrite this test
         UserContact secondContact = new UserContact();
         secondContact.setRequester(firstTestUser);
         secondContact.setStatus(ContactStatus.REJECTED);
@@ -124,7 +124,7 @@ public class UserRepoTest {
 
         contacts.delete(firstContact);
         contacts.delete(secondContact);
-        //users.delete(firstTestUser);
-    }
+        users.delete(firstTestUser);
+    }*/
 
 }

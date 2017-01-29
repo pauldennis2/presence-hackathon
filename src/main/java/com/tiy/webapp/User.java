@@ -1,5 +1,7 @@
 package com.tiy.webapp;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.util.Set;
 
@@ -35,8 +37,13 @@ public class User {
     @Column(nullable = true)
     Long checkedInEventId;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade=CascadeType.MERGE, mappedBy="requester")
-    Set<UserContact> userContactSet;
+    @OneToMany(fetch = FetchType.EAGER, cascade=CascadeType.MERGE, orphanRemoval = true, mappedBy="requester")
+    @JsonManagedReference
+    Set<UserContact> outgoingRequests;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade=CascadeType.MERGE, orphanRemoval = true, mappedBy="requestee")
+    @JsonManagedReference
+    Set<UserContact> incomingRequests;
 
     @ManyToMany
     @JoinTable (
@@ -153,11 +160,19 @@ public class User {
         this.imageString = imageString;
     }
 
-    public Set<UserContact> getUserContactSet() {
-        return userContactSet;
+    public Set<UserContact> getOutgoingRequests() {
+        return outgoingRequests;
     }
 
-    public void setUserContactSet(Set<UserContact> userContactSet) {
-        this.userContactSet = userContactSet;
+    public void setOutgoingRequests(Set<UserContact> outgoingRequests) {
+        this.outgoingRequests = outgoingRequests;
+    }
+
+    public Set<UserContact> getIncomingRequests() {
+        return incomingRequests;
+    }
+
+    public void setIncomingRequests(Set<UserContact> incomingRequests) {
+        this.incomingRequests = incomingRequests;
     }
 }

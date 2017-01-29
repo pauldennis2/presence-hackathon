@@ -10,4 +10,6 @@ import java.util.List;
 public interface UserRepo extends CrudRepository<User, Long> {
     User findFirstByEmail(String email);
     List<User> findByCheckedInEventId(Long checkedInEventId);
+
+    //List<User> findByIncomingRequestsOrOutgoingRequestsAndStatus (User user, ContactStatus status);
 }
