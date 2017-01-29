@@ -7,9 +7,12 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.bind.annotation.RestController;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -21,7 +24,10 @@ import static org.junit.Assert.*;
 public class UserRepoTest {
 
     @Autowired
-    UserRepo userRepo;
+    UserRepo users;
+    
+    @Autowired
+    ContactRepo contacts;
 
     User firstTestUser;
     User secondTestUser;
@@ -40,22 +46,22 @@ public class UserRepoTest {
 
     @Test
     public void testBasicUserCrud () {
-        userRepo.save(firstTestUser);
-        userRepo.save(secondTestUser);
+        users.save(firstTestUser);
+        users.save(secondTestUser);
 
-        User firstRetrievedUser = userRepo.findFirstByEmail(firstTestUser.getEmail());
+        User firstRetrievedUser = users.findFirstByEmail(firstTestUser.getEmail());
         assertNotNull(firstRetrievedUser);
-        User secondRetrievedUser = userRepo.findFirstByEmail(secondTestUser.getEmail());
+        User secondRetrievedUser = users.findFirstByEmail(secondTestUser.getEmail());
         assertNotNull(secondRetrievedUser);
         assertEquals(firstTestUser.getPosition(), firstRetrievedUser.getPosition());
         assertEquals(secondTestUser.getPassword(), secondRetrievedUser.getPassword());
 
-        userRepo.delete(firstRetrievedUser);
-        userRepo.delete(secondRetrievedUser);
+        users.delete(firstRetrievedUser);
+        users.delete(secondRetrievedUser);
 
-        User firstNullUser = userRepo.findFirstByEmail(firstTestUser.getEmail());
+        User firstNullUser = users.findFirstByEmail(firstTestUser.getEmail());
         assertNull(firstNullUser);
-        User secondNullUser = userRepo.findFirstByEmail(secondTestUser.getEmail());
+        User secondNullUser = users.findFirstByEmail(secondTestUser.getEmail());
         assertNull(secondNullUser);
     }
 
@@ -64,11 +70,11 @@ public class UserRepoTest {
         secondTestUser.setCheckedInEventId(new Long(5));
         User thirdTestUser = new User("gobble@turkey", "1234", "GM", "CTO", "IPA", "DBA");
         thirdTestUser.setCheckedInEventId(new Long(5));
-        userRepo.save(thirdTestUser);
-        userRepo.save(firstTestUser);
-        userRepo.save(secondTestUser);
+        users.save(thirdTestUser);
+        users.save(firstTestUser);
+        users.save(secondTestUser);
 
-        List<User> attendees = userRepo.findByCheckedInEventId(new Long(5));
+        List<User> attendees = users.findByCheckedInEventId(new Long(5));
         assertEquals(2, attendees.size());
         String name = attendees.get(0).getFirstName();
 
@@ -76,16 +82,49 @@ public class UserRepoTest {
             assertTrue(false);
         }
 
-        userRepo.delete(firstTestUser);
-        userRepo.delete(secondTestUser);
-        userRepo.delete(thirdTestUser);
+        users.delete(firstTestUser);
+        users.delete(secondTestUser);
+        users.delete(thirdTestUser);
 
-        User firstNullUser = userRepo.findFirstByEmail(firstTestUser.getEmail());
+        User firstNullUser = users.findFirstByEmail(firstTestUser.getEmail());
         assertNull(firstNullUser);
-        User secondNullUser = userRepo.findFirstByEmail(secondTestUser.getEmail());
+        User secondNullUser = users.findFirstByEmail(secondTestUser.getEmail());
         assertNull(secondNullUser);
-        User thirdNullUser = userRepo.findFirstByEmail(thirdTestUser.getEmail());
+        User thirdNullUser = users.findFirstByEmail(thirdTestUser.getEmail());
         assertNull(thirdNullUser);
+    }
+
+    @Test
+    public void testOtherthing () {
+        users.save(firstTestUser);
+        Set<UserContact> userContactSet = new HashSet<>();
+        UserContact firstContact = new UserContact();
+        firstContact.setRequester(firstTestUser);
+        firstContact.setStatus(ContactStatus.FRIENDS);
+        firstContact.setOriginalRequestTime(Timestamp.valueOf(LocalDateTime.now()));
+        contacts.save(firstContact);
+
+        UserContact secondContact = new UserContact();
+        secondContact.setRequester(firstTestUser);
+        secondContact.setStatus(ContactStatus.REJECTED);
+        secondContact.setOriginalRequestTime(Timestamp.valueOf(LocalDateTime.now()));
+        contacts.save(secondContact);
+
+        userContactSet.add(firstContact);
+        userContactSet.add(secondContact);
+
+        firstTestUser.setUserContactSet(userContactSet);
+        users.save(firstTestUser);
+
+
+        User retrievedUser = users.findFirstByEmail(firstTestUser.getEmail());
+        assertNotNull(retrievedUser);
+        assertEquals(2, retrievedUser.getUserContactSet().size());
+
+
+        contacts.delete(firstContact);
+        contacts.delete(secondContact);
+        //users.delete(firstTestUser);
     }
 
 }

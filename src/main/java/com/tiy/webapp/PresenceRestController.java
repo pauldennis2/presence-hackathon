@@ -64,12 +64,13 @@ public class PresenceRestController {
 
     //tested in postman WITH DB
     @RequestMapping(path = "/user-event-signup.json", method = RequestMethod.POST)
-    public Response userEventSignup (@RequestBody EventSignupRequest eventSignupRequest) {
+    public Response userEventSignup (@RequestBody EventSignupRequest eventSignupRequest) throws Exception {
         initializeDb();
         String email = eventSignupRequest.getEmail();
         Long eventId = eventSignupRequest.getEventId();
         User user = users.findFirstByEmail(email);
         Event event = events.findOne(eventId);
+
         if (user != null && event != null) {
             user.eventCheckIn(event);
             users.save(user);
@@ -80,7 +81,7 @@ public class PresenceRestController {
     }
 
     //tested in postman WITH DB
-    @RequestMapping(path = "/respond-to-request.json", method = RequestMethod.POST)
+    /*@RequestMapping(path = "/respond-to-request.json", method = RequestMethod.POST)
     public Response respondToRequest (@RequestBody ContactResponseRequest contactResponseRequest) {
         initializeDb();
         String email = contactResponseRequest.getEmail();
@@ -92,7 +93,8 @@ public class PresenceRestController {
         System.out.println(accept);
 
         UserContact contact = contacts.findOne(requestId);
-        if (!contact.getRequesteeEmail().equals(email)) {
+
+        if (!contact.getRequestee().getEmail().equals(email)) {
             return new Response(false);
         }
         if (contact == null) {
@@ -108,16 +110,14 @@ public class PresenceRestController {
             contacts.save(contact);
             return new Response(true);
         }
-    }
+    }*/
 
-    //tested in postman WITH DB
+    /*//tested in postman WITH DB
     @RequestMapping(path = "/send-request.json", method = RequestMethod.POST)
     public Response sendRequest (@RequestBody UserContact userContact) {
         initializeDb();
-        String requesterEmail = userContact.getRequesterEmail();
-        String requesteeEmail = userContact.getRequesteeEmail();
-        User requester = users.findFirstByEmail(requesterEmail);
-        User requestee = users.findFirstByEmail(requesteeEmail);
+        User requester = userContact.getRequester();
+        User requestee = userContact.getRequester();
         if (requester == null || requestee == null) {
             return new Response(false);
         }
@@ -126,7 +126,7 @@ public class PresenceRestController {
         }
         contacts.save(userContact);
         return new Response(true);
-    }
+    }*/
 
 
     //tested in postman WITH DB
@@ -150,7 +150,8 @@ public class PresenceRestController {
     //tested with postman
     @RequestMapping(path = "/user-incoming-requests.json", method = RequestMethod.POST)
     public List<UserContact> userIncomingRequests (@RequestBody DumbEmailWrapper wrapper) {
-        return contacts.findByRequesteeEmailAndStatus(wrapper.getEmail(), ContactStatus.REQUESTED);
+        //return contacts.findByRequesteeEmailAndStatus(wrapper.getEmail(), ContactStatus.REQUESTED);
+        throw new AssertionError("Dom you suck");
     }
 
     //tested with postman
@@ -162,7 +163,7 @@ public class PresenceRestController {
     //tested with postman
     @RequestMapping(path = "/get-user-contacts.json", method = RequestMethod.POST)
     public List<User> getUserContacts (@RequestBody DumbEmailWrapper wrapper) {
-        List<UserContact> requesteeList = contacts.findByRequesteeEmailAndStatus(wrapper.getEmail(), ContactStatus.FRIENDS);
+        /*List<UserContact> requesteeList = contacts.findByRequesteeEmailAndStatus(wrapper.getEmail(), ContactStatus.FRIENDS);
         List<UserContact> requesterList = contacts.findByRequesterEmailAndStatus(wrapper.getEmail(), ContactStatus.FRIENDS);
         List<User> userContacts = new ArrayList<>();
         for (UserContact userContact : requesteeList) {
@@ -172,8 +173,11 @@ public class PresenceRestController {
         for (UserContact userContact : requesterList) {
             String requesteeEmail = userContact.getRequesteeEmail();
             userContacts.add(users.findFirstByEmail(requesteeEmail));
-        }
-        return userContacts;
+        }*/
+        List<User> friends;
+
+        //return userContacts;
+        throw new AssertionError("Fix");
     }
 
     //tested with postman
@@ -241,9 +245,10 @@ public class PresenceRestController {
 
     public void initializeContacts () {
         if (contacts.count() == 0) {
-            System.out.println("Adding contact");
-            UserContact userContact = new UserContact("paul@gmail", "adrian@gmail", ContactStatus.REQUESTED);
-            contacts.save(userContact);
+            User user1 = users.findFirstByEmail("paul@gmail");
+            User user2 = users.findFirstByEmail("adrian@gmail");
+            //UserContact userContact = new UserContact(user1, user2, ContactStatus.REQUESTED);
+            //contacts.save(userContact);
         }
     }
 }

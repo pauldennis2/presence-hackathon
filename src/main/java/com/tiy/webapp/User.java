@@ -35,11 +35,14 @@ public class User {
     @Column(nullable = true)
     Long checkedInEventId;
 
+    @OneToMany(fetch = FetchType.EAGER, cascade=CascadeType.MERGE, mappedBy="requester")
+    Set<UserContact> userContactSet;
+
     @ManyToMany
     @JoinTable (
-            name = "user_events",
-            joinColumns = @JoinColumn(name="user_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "event_id", referencedColumnName = "id")
+        name = "user_events",
+        joinColumns = @JoinColumn(name="user_id", referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(name = "event_id", referencedColumnName = "id")
     )
     Set<Event> events;
 
@@ -134,4 +137,27 @@ public class User {
         this.password = password;
     }
 
+    public Set<Event> getEvents() {
+        return events;
+    }
+
+    public void setEvents(Set<Event> events) {
+        this.events = events;
+    }
+
+    public String getImageString() {
+        return imageString;
+    }
+
+    public void setImageString(String imageString) {
+        this.imageString = imageString;
+    }
+
+    public Set<UserContact> getUserContactSet() {
+        return userContactSet;
+    }
+
+    public void setUserContactSet(Set<UserContact> userContactSet) {
+        this.userContactSet = userContactSet;
+    }
 }

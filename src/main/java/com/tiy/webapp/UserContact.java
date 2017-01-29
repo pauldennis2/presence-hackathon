@@ -12,15 +12,25 @@ import java.time.LocalDateTime;
 @Table(name = "contacts")
 public class UserContact {
 
+
+
+    /*@Column(nullable = false)
+    String requesterEmail;
+
+    @Column(nullable = false)
+    String requesteeEmail;*/
+
+    /*@OneToOne
+    @JoinColumn(name = "requestee_id", nullable = false)
+    User requestee;*/
+
     @GeneratedValue
     @Id
     Long id;
 
-    @Column(nullable = false)
-    String requesterEmail;
-
-    @Column(nullable = false)
-    String requesteeEmail;
+    @ManyToOne(cascade=CascadeType.REMOVE)
+    //@JoinColumn(name = "requester_id", nullable = false)
+    User requester;
 
     @Column(nullable = false)
     ContactStatus status;
@@ -35,12 +45,12 @@ public class UserContact {
         originalRequestTime = Timestamp.valueOf(LocalDateTime.now());
     }
 
-    public UserContact(String requesterEmail, String requesteeEmail, ContactStatus status) {
-        this.requesterEmail = requesterEmail;
-        this.requesteeEmail = requesteeEmail;
+    /*public UserContact(User requester, User requestee, ContactStatus status) {
+        this.requester = requester;
+        this.requestee = requestee;
         this.status = status;
         originalRequestTime = Timestamp.valueOf(LocalDateTime.now());
-    }
+    }*/
 
     public Long getId() {
         return id;
@@ -74,19 +84,19 @@ public class UserContact {
         this.refreshRequestTime = refreshRequestTime;
     }
 
-    public String getRequesterEmail() {
-        return requesterEmail;
+    public User getRequester() {
+        return requester;
     }
 
-    public void setRequesterEmail(String requesterEmail) {
-        this.requesterEmail = requesterEmail;
+    public void setRequester(User requester) {
+        this.requester = requester;
+    }
+    /*
+    public User getRequestee() {
+        return requestee;
     }
 
-    public String getRequesteeEmail() {
-        return requesteeEmail;
-    }
-
-    public void setRequesteeEmail(String requesteeEmail) {
-        this.requesteeEmail = requesteeEmail;
-    }
+    public void setRequestee(User requestee) {
+        this.requestee = requestee;
+    }*/
 }

@@ -9,8 +9,9 @@ import java.util.List;
  */
 public interface ContactRepo extends CrudRepository<UserContact, Long> {
     List<UserContact> findByRequesterEmail(String requesterEmail);
-    List<UserContact> findByRequesteeEmail(String requesteeEmail);
+    //List<UserContact> findByRequesteeEmail(String requesteeEmail);
     List<UserContact> findByRequesterEmailAndStatus (String requesterEmail, ContactStatus status);
-    List<UserContact> findByRequesteeEmailAndStatus (String requesteeEmail, ContactStatus status);
+    //List<UserContact> findByRequesteeEmailAndStatus (String requesteeEmail, ContactStatus status);
+
 
 }
