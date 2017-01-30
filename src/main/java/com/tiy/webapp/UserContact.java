@@ -119,6 +119,6 @@ public class UserContact {
         if (current == null) {
             current = this.getOriginalRequestTime();
         }
-        return new SimpleUserContact(this.getRequester().getEmail(), this.getRequestee().getEmail(), this.getStatus(), current);
+        return new SimpleUserContact(this.getRequester().getEmail(), this.getRequestee().getEmail(), this.getStatus(), current, this.getId());
     }
 }

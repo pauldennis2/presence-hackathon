@@ -111,15 +111,27 @@ public class PresenceRestController {
     //public Response sendRequest (@RequestBody UserContact userContact) {
     public Response sendRequest(@RequestBody UserContactRequest userContactRequest) {
         initializeDb();
+        ContactStatus status = userContactRequest.getStatus();
+        if (!(status == ContactStatus.BLOCKED || status == ContactStatus.REQUESTED)) {
+            return new Response(false);
+        }
+
         User requester = users.findFirstByEmail(userContactRequest.getRequesterEmail());
         User requestee = users.findFirstByEmail(userContactRequest.getRequesteeEmail());
+        //todo add check to make sure users aren't friends already
+        if (status == ContactStatus.REQUESTED) {
+            if (usersAreFriends(requester, requestee)) {
+                return new Response(false);
+            }
+        }
+
         if (requester == null || requestee == null) {
             return new Response(false);
         }
         if (requester.equals(requestee)) {
             return new Response(false);
         }
-        contacts.save(new UserContact(requester, requestee, userContactRequest.getStatus()));
+        contacts.save(new UserContact(requester, requestee, status));
         return new Response(true);
     }
 
@@ -291,6 +303,24 @@ public class PresenceRestController {
         return new Response(true);
     }
 
+    public boolean usersAreFriends (User firstUser, User secondUser) {
+        Set<UserContact> firstUserIncomingRequests = firstUser.getIncomingRequests();
+        Set<UserContact> firstUserOutgoingRequests = firstUser.getOutgoingRequests();
+
+        for (UserContact userContact : firstUserIncomingRequests) {
+            if (userContact.getRequester().getEmail().equals(secondUser.getEmail())) {
+                return true;
+            }
+        }
+        for (UserContact userContact : firstUserOutgoingRequests) {
+            if (userContact.getRequestee().getEmail().equals(secondUser.getEmail())) {
+                return true;
+            }
+        }
+        return false;
+        //todo for sure add a unit test for this
+    }
+
     public void initializeDb () {
         if (users == null || contacts == null || events == null) {
             throw new AssertionError("One of the repos is null.");
@@ -308,10 +338,12 @@ public class PresenceRestController {
         User user2 = users.findFirstByEmail("adrian@gmail");
         if (user1 == null) {
             user1 = new User("paul@gmail", "Paul", "Dennis", "TIY", "Student", "drifting3");
+            user1.setPhotoVisible(false);
             users.save(user1);
         }
         if (user2 == null) {
             user2 = new User("adrian@gmail", "Adrian", "McDaniel", "TIY", "Student", "elevation9");
+            user2.setPhotoVisible(true);
             users.save(user2);
         }
     }

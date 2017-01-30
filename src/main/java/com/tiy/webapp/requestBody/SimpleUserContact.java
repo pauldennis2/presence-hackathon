@@ -13,16 +13,18 @@ public class SimpleUserContact {
     String requesteeEmail;
     ContactStatus status;
     Timestamp recentRequestTime;
+    Long requestId;
 
     public SimpleUserContact () {
 
     }
 
-    public SimpleUserContact(String requesterEmail, String requesteeEmail, ContactStatus status, Timestamp recentRequestTime) {
+    public SimpleUserContact(String requesterEmail, String requesteeEmail, ContactStatus status, Timestamp recentRequestTime, Long requestId) {
         this.requesterEmail = requesterEmail;
         this.requesteeEmail = requesteeEmail;
         this.status = status;
         this.recentRequestTime = recentRequestTime;
+        this.requestId = requestId;
     }
 
     public String getRequesterEmail() {
@@ -55,5 +57,13 @@ public class SimpleUserContact {
 
     public void setRecentRequestTime(Timestamp recentRequestTime) {
         this.recentRequestTime = recentRequestTime;
+    }
+
+    public Long getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(Long requestId) {
+        this.requestId = requestId;
     }
 }
