@@ -57,9 +57,9 @@ public class ContactRepoTest {
         UserContact secondSavedBlockContact = contacts.save(block2Contact);
         //Setup ^^^
 
-        int size = contacts.findByRequesterEmailAndStatus(user1.getEmail(), ContactStatus.BLOCKED).size();
-        assertEquals (1, size);
-
+//        int size = contacts.findByRequesterEmailAndStatus(user1.getEmail(), ContactStatus.BLOCKED).size();
+//        assertEquals (1, size);
+        assertFalse(true);
 
 
         //Cleanup vvvvv
@@ -81,6 +81,28 @@ public class ContactRepoTest {
         assertNull(firstNullUser);
         assertNull(secondNullUser);
     }
+
+    /*@Test
+    public void testTransientProperties () {
+        users.save(user1);
+        users.save(user2);
+        //firstContact.setRequesteeEmail("not a real email");
+        UserContact savedContact = contacts.save(firstContact);
+
+        UserContact retrievedContact = contacts.findOne(savedContact.getId());
+        assertNotNull(retrievedContact);
+        assertNull(retrievedContact.getRequesteeEmail());
+
+        contacts.delete(firstContact);
+        UserContact nullContact = contacts.findOne(savedContact.getId());
+        assertNull(nullContact);
+        users.delete(user1);
+        users.delete(user2);
+        User firstNullUser = users.findFirstByEmail(user1.getEmail());
+        User secondNullUser = users.findFirstByEmail(user2.getEmail());
+        assertNull(firstNullUser);
+        assertNull(secondNullUser);
+    }*/
 
     @Test
     public void testBasicContactCrud () {

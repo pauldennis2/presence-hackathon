@@ -133,6 +133,7 @@ public class PresenceRestController {
      * param: must include the user trying to see the list of attendees
      * @return the list of event attendees who haven't blocked the user
      */
+/*
     @RequestMapping(path = "/get-event-attendees-wblock.json", method = RequestMethod.POST)
     public Set<User> getEventAttendeesBlock (@RequestBody EventAttendeesForUserRequest request) {
         initializeDb();
@@ -149,19 +150,28 @@ public class PresenceRestController {
         }
         return attendees;
     }
+*/
 
 
     //***************MVP Endpoints********************\\
 
-    @RequestMapping(path = "/user-registration.json", method = RequestMethod.POST)
+    /*@RequestMapping(path = "/user-registration.json", method = RequestMethod.POST)
     public Response userRegistration (@RequestBody User newUser) {
         initializeDb();
         users.save(newUser);
         return new Response(true);
+    }*/
+
+    @RequestMapping(path = "/user-registration.json", method = RequestMethod.POST)
+    public Response userRegistration (@RequestBody UserWrapper userWrapper) {
+        initializeDb();
+        User user = new User(userWrapper);
+        users.save(user);
+        return new Response(true);
     }
 
     @RequestMapping(path = "/user-incoming-requests.json", method = RequestMethod.POST)
-    public Set<UserContact> userIncomingRequests (@RequestBody DumbEmailWrapper wrapper) {
+    public Set<SimpleUserContact> userIncomingRequests (@RequestBody DumbEmailWrapper wrapper) {
         initializeDb();
         Set<UserContact> incomingRequests = users.findFirstByEmail(wrapper.getEmail()).getIncomingRequests();
         for (UserContact userContact : incomingRequests) {
@@ -169,11 +179,15 @@ public class PresenceRestController {
                 incomingRequests.remove(userContact);
             }
         }
-        return incomingRequests;
+        Set<SimpleUserContact> simpleContacts = new HashSet<>();
+        for (UserContact userContact : incomingRequests) {
+            simpleContacts.add(userContact.getSimpleContact());
+        }
+        return simpleContacts;
     }
 
     @RequestMapping(path = "/user-outgoing-requests.json", method = RequestMethod.POST)
-    public Set<UserContact> userOutgoingRequests (@RequestBody DumbEmailWrapper wrapper) {
+    public Set<SimpleUserContact> userOutgoingRequests (@RequestBody DumbEmailWrapper wrapper) {
         initializeDb();
         Set<UserContact> outgoingRequests = users.findFirstByEmail(wrapper.getEmail()).getOutgoingRequests();
         for (UserContact userContact : outgoingRequests) {
@@ -181,7 +195,11 @@ public class PresenceRestController {
                 outgoingRequests.remove(userContact);
             }
         }
-        return outgoingRequests;
+        Set<SimpleUserContact> simpleContacts = new HashSet<>();
+        for (UserContact userContact : outgoingRequests) {
+            simpleContacts.add(userContact.getSimpleContact());
+        }
+        return simpleContacts;
     }
 
     //somewhat tested
@@ -216,35 +234,28 @@ public class PresenceRestController {
     //v1.0 Endpoints
 
     @RequestMapping(path = "/user-stale-requests-made.json", method = RequestMethod.POST)
-    public Set<UserContact> userStaleRequestsMade (@RequestBody DumbEmailWrapper wrapper) {
+    public Set<SimpleUserContact> userStaleRequestsMade (@RequestBody DumbEmailWrapper wrapper) {
         initializeDb();
         User user = users.findFirstByEmail(wrapper.getEmail());
         if (user == null) {
             return null;
         }
+        //todo fix this to work in one pass through the list. this is super clumsy
         Set<UserContact> outgoingRequests = user.getOutgoingRequests();
         for (UserContact userContact : outgoingRequests) {
             if (!userContact.isStale() && userContact.getStatus() == ContactStatus.REQUESTED) {
                 outgoingRequests.remove(userContact);
             }
         }
-        return outgoingRequests;
-    }
-
-    @RequestMapping(path = "/set-photo-visibility.json", method = RequestMethod.POST)
-    public Response setPhotoVisibility (@RequestBody SetPhotoVisibleRequest wrapper) {
-        initializeDb();
-        User user = users.findFirstByEmail(wrapper.getEmail());
-        if (user == null) {
-            return new Response(false);
+        Set<SimpleUserContact> simpleContacts = new HashSet<>();
+        for (UserContact userContact : outgoingRequests) {
+            simpleContacts.add(userContact.getSimpleContact());
         }
-        user.setPhotoVisible(wrapper.getPhotoVisible());
-        users.save(user);
-        return new Response(true);
+        return simpleContacts;
     }
 
     @RequestMapping(path = "/user-stale-requests-received.json", method = RequestMethod.POST)
-    public Set<UserContact> userStaleRequestsReceived (@RequestBody DumbEmailWrapper wrapper) {
+    public Set<SimpleUserContact> userStaleRequestsReceived (@RequestBody DumbEmailWrapper wrapper) {
         initializeDb();
         User user = users.findFirstByEmail(wrapper.getEmail());
         if (user == null) {
@@ -256,7 +267,11 @@ public class PresenceRestController {
                 incomingRequests.remove(userContact);
             }
         }
-        return incomingRequests;
+        Set<SimpleUserContact> simpleContacts = new HashSet<>();
+        for (UserContact userContact : incomingRequests) {
+            simpleContacts.add(userContact.getSimpleContact());
+        }
+        return simpleContacts;
     }
 
     @RequestMapping(path = "/refresh-stale-request.json", method = RequestMethod.POST)
@@ -268,6 +283,18 @@ public class PresenceRestController {
             return new Response(false);
         }
         contact.setRefreshRequestTime(Timestamp.valueOf(LocalDateTime.now()));
+        return new Response(true);
+    }
+
+    @RequestMapping(path = "/set-photo-visibility.json", method = RequestMethod.POST)
+    public Response setPhotoVisibility (@RequestBody SetPhotoVisibleRequest wrapper) {
+        initializeDb();
+        User user = users.findFirstByEmail(wrapper.getEmail());
+        if (user == null) {
+            return new Response(false);
+        }
+        user.setPhotoVisible(wrapper.getPhotoVisible());
+        users.save(user);
         return new Response(true);
     }
 

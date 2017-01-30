@@ -1,9 +1,11 @@
 package com.tiy.webapp;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.tiy.webapp.requestBody.UserWrapper;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -77,6 +79,15 @@ public class User {
         this.company = company;
         this.position = position;
         this.password = password;
+    }
+
+    public User (UserWrapper userWrapper) {
+        this.email = userWrapper.getEmail();
+        this.firstName = userWrapper.getFirstName();
+        this.lastName = userWrapper.getLastName();
+        this.company = userWrapper.getCompany();
+        this.position = userWrapper.getPosition();
+        this.password = userWrapper.getPassword();
     }
 
     public Long getId() {
@@ -165,6 +176,9 @@ public class User {
     }
 
     public Set<UserContact> getOutgoingRequests() {
+        /*if (outgoingRequests == null) {
+            return new HashSet<UserContact>();
+        }*/
         return outgoingRequests;
     }
 

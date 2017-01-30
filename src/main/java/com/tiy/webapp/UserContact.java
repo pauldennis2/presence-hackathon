@@ -1,6 +1,7 @@
 package com.tiy.webapp;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.tiy.webapp.requestBody.SimpleUserContact;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -22,11 +23,11 @@ public class UserContact {
 
     @ManyToOne(cascade=CascadeType.MERGE)
     @JsonBackReference
-    User requester;
+    private User requester;
 
     @ManyToOne(cascade=CascadeType.MERGE)
     @JsonBackReference
-    User requestee;
+    private User requestee;
 
     @Column(nullable = false)
     ContactStatus status;
@@ -84,7 +85,7 @@ public class UserContact {
         return requester;
     }
 
-    public void setRequester(User requester) {
+    public void setRequester(User requester) throws Exception {
         this.requester = requester;
     }
 
@@ -110,6 +111,14 @@ public class UserContact {
 
     @Override
     public String toString () {
-        return "requester= " + requester.getFirstName() + "\trequestee= " + requestee.getFirstName() + "\tstatus=" + status.toString();
+        return "****** requester= " + requester.getFirstName() + "\trequestee= " + requestee.getFirstName() + "\tstatus=" + status.toString();
+    }
+
+    public SimpleUserContact getSimpleContact() {
+        Timestamp current = this.getRefreshRequestTime();
+        if (current == null) {
+            current = this.getOriginalRequestTime();
+        }
+        return new SimpleUserContact(this.getRequester().getEmail(), this.getRequestee().getEmail(), this.getStatus(), current);
     }
 }
