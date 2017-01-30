@@ -155,13 +155,6 @@ public class PresenceRestController {
 
     //***************MVP Endpoints********************\\
 
-    /*@RequestMapping(path = "/user-registration.json", method = RequestMethod.POST)
-    public Response userRegistration (@RequestBody User newUser) {
-        initializeDb();
-        users.save(newUser);
-        return new Response(true);
-    }*/
-
     @RequestMapping(path = "/user-registration.json", method = RequestMethod.POST)
     public Response userRegistration (@RequestBody UserWrapper userWrapper) {
         initializeDb();

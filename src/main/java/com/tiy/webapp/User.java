@@ -88,6 +88,7 @@ public class User {
         this.company = userWrapper.getCompany();
         this.position = userWrapper.getPosition();
         this.password = userWrapper.getPassword();
+        this.photoVisible = userWrapper.isPhotoVisible();
     }
 
     public Long getId() {

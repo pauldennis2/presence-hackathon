@@ -13,6 +13,7 @@ public class UserWrapper {
     String password;
     String firstName;
     String lastName;
+    boolean photoVisible;
 
     public UserWrapper () {
 
@@ -72,5 +73,13 @@ public class UserWrapper {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public boolean isPhotoVisible() {
+        return photoVisible;
+    }
+
+    public void setPhotoVisible(boolean photoVisible) {
+        this.photoVisible = photoVisible;
     }
 }
