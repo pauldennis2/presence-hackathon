@@ -180,11 +180,11 @@ public class User {
         this.incomingRequests = incomingRequests;
     }
 
-    public boolean isPhotoVisible() {
+    public Boolean getPhotoVisible() {
         return photoVisible;
     }
 
-    public void setPhotoVisible(boolean photoVisible) {
+    public void setPhotoVisible(Boolean photoVisible) {
         this.photoVisible = photoVisible;
     }
 }
