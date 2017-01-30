@@ -74,9 +74,9 @@ public class UserRepoTest {
         users.save(firstTestUser);
         users.save(secondTestUser);
 
-        List<User> attendees = users.findByCheckedInEventId(new Long(5));
+        Set<User> attendees = users.findByCheckedInEventId(new Long(5));
         assertEquals(2, attendees.size());
-        String name = attendees.get(0).getFirstName();
+        String name = attendees.iterator().next().getFirstName();
 
         if (!name.equals("1234") || name.equals("Carth")) {
             assertTrue(false);

@@ -32,33 +32,35 @@ public class PresenceRestController {
     ContactRepo contacts;
 
     //POC Endpoints
-    //tested in postman WITH DB
     @RequestMapping(path = "/user-login.json", method = RequestMethod.POST)
     public Response userLogin (@RequestBody UserLoginRequest userLoginRequest) {
-
         initializeDb();
-        String email = userLoginRequest.getEmail();
-        //User user = userMap.get(email);
-        User user = users.findFirstByEmail(email);
-        if (user != null && user.getPassword().equals(userLoginRequest.getPassword())) {
-            return new Response(true);
+        User user = users.findFirstByEmail(userLoginRequest.getEmail());
+        if (user != null) {
+            if (user.getPassword().equals(userLoginRequest.getPassword())) {
+                return new Response(true);
+            }
         }
         return new Response(false);
     }
 
-    //tested in postman WITH DB
     @RequestMapping(path = "/get-open-events.json", method = RequestMethod.GET)
-    public Iterable<Event> getOpenEvents () {
+    public Set<Event> getOpenEvents () {
         initializeDb();
-        return events.findAll();
+        Iterable<Event> allEvents = events.findAll();
+        Set<Event> currentEvents = new HashSet<>();
+        for (Event event : allEvents) {
+            if (event.isCurrent()) {
+                currentEvents.add(event);
+            }
+        }
+        return currentEvents;
     }
 
-    //tested in postman WITH DB
     @RequestMapping(path = "/get-users-event.json", method = RequestMethod.POST)
     public Event getUsersEvent (@RequestBody DumbEmailWrapper dumbWrapper) {
         initializeDb();
         User user = users.findFirstByEmail(dumbWrapper.getEmail());
-        System.out.println(user);
         if (user != null) {
             Long id = user.getCheckedInEventId();
             return events.findOne(id);//Could be null!
@@ -66,19 +68,15 @@ public class PresenceRestController {
         return null;
     }
 
-    //tested in postman WITH DB
     @RequestMapping(path = "/user-event-signup.json", method = RequestMethod.POST)
     public Response userEventSignup (@RequestBody EventSignupRequest eventSignupRequest) throws Exception {
         initializeDb();
-        String email = eventSignupRequest.getEmail();
-        Long eventId = eventSignupRequest.getEventId();
-        User user = users.findFirstByEmail(email);
-        Event event = events.findOne(eventId);
+        User user = users.findFirstByEmail(eventSignupRequest.getEmail());
+        Event event = events.findOne(eventSignupRequest.getEventId());
 
         if (user != null && event != null) {
             user.eventCheckIn(event);
             users.save(user);
-            //This is not creating a new duplicate user. (todo doubleckeck)
             return new Response(true);
         }
         return new Response(false);
@@ -87,22 +85,17 @@ public class PresenceRestController {
     @RequestMapping(path = "/respond-to-request.json", method = RequestMethod.POST)
     public Response respondToRequest (@RequestBody ContactResponseRequest contactResponseRequest) {
         initializeDb();
-        String email = contactResponseRequest.getEmail();
-        Long requestId = contactResponseRequest.getRequestId();
         boolean accept = contactResponseRequest.isAccept();
+        UserContact contact = contacts.findOne(contactResponseRequest.getRequestId());
 
-        System.out.println(email);
-        System.out.println(requestId);
-        System.out.println(accept);
-
-        UserContact contact = contacts.findOne(requestId);
-
-        if (!contact.getRequestee().getEmail().equals(email)) {
-            return new Response(false);
-        }
         if (contact == null) {
             return new Response(false);
         }
+        if (!contact.getRequestee().getEmail().equals(contactResponseRequest.getEmail())) {
+            return new Response(false);
+            //Only the requestee can respond to a request
+        }
+
         //Do stuff
         if (accept) {
             contact.setStatus(ContactStatus.FRIENDS);
@@ -131,10 +124,9 @@ public class PresenceRestController {
     }
 
     @RequestMapping(path = "/get-event-attendees.json", method = RequestMethod.POST)
-    public List<User> getEventAttendees (@RequestBody EventAttendeesRequest request) {
+    public Set<User> getEventAttendees (@RequestBody EventAttendeesRequest request) {
         initializeDb();
-        Long eventId = request.getEventId();
-        return users.findByCheckedInEventId(eventId);
+        return users.findByCheckedInEventId(request.getEventId());
     }
 
 
@@ -150,10 +142,9 @@ public class PresenceRestController {
     @RequestMapping(path = "/user-incoming-requests.json", method = RequestMethod.POST)
     public Set<UserContact> userIncomingRequests (@RequestBody DumbEmailWrapper wrapper) {
         initializeDb();
-        //todo fix to return only fresh requests
         Set<UserContact> incomingRequests = users.findFirstByEmail(wrapper.getEmail()).getIncomingRequests();
         for (UserContact userContact : incomingRequests) {
-            if (userContact.getStatus() != ContactStatus.REQUESTED) {
+            if (userContact.getStatus() != ContactStatus.REQUESTED || userContact.isStale()) {
                 incomingRequests.remove(userContact);
             }
         }
@@ -163,10 +154,16 @@ public class PresenceRestController {
     @RequestMapping(path = "/user-outgoing-requests.json", method = RequestMethod.POST)
     public Set<UserContact> userOutgoingRequests (@RequestBody DumbEmailWrapper wrapper) {
         initializeDb();
-        //todo fix to return only ones with status request
-        return users.findFirstByEmail(wrapper.getEmail()).getOutgoingRequests();
+        Set<UserContact> outgoingRequests = users.findFirstByEmail(wrapper.getEmail()).getOutgoingRequests();
+        for (UserContact userContact : outgoingRequests) {
+            if (userContact.getStatus() != ContactStatus.REQUESTED  || userContact.isStale()) {
+                outgoingRequests.remove(userContact);
+            }
+        }
+        return outgoingRequests;
     }
 
+    //somewhat tested
     @RequestMapping(path = "/get-user-contacts.json", method = RequestMethod.POST)
     public Set<User> getUserContacts (@RequestBody DumbEmailWrapper wrapper) {
         initializeDb();
@@ -206,7 +203,7 @@ public class PresenceRestController {
         }
         Set<UserContact> outgoingRequests = user.getOutgoingRequests();
         for (UserContact userContact : outgoingRequests) {
-            if (!userContact.isStale()) {
+            if (!userContact.isStale() && userContact.getStatus() == ContactStatus.REQUESTED) {
                 outgoingRequests.remove(userContact);
             }
         }
@@ -222,7 +219,7 @@ public class PresenceRestController {
         }
         Set<UserContact> incomingRequests = user.getIncomingRequests();
         for (UserContact userContact : incomingRequests) {
-            if (!userContact.isStale()) {
+            if (!userContact.isStale() && userContact.getStatus() == ContactStatus.REQUESTED) {
                 incomingRequests.remove(userContact);
             }
         }
@@ -245,7 +242,6 @@ public class PresenceRestController {
         if (users == null || contacts == null || events == null) {
             throw new AssertionError("One of the repos is null.");
         }
-        //public User(String email, String firstName, String lastName, String company, String position, String password)
         if (!dbInitialized) {
             initializeUsers();
             initializeEvents();

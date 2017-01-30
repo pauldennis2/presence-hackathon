@@ -1,5 +1,7 @@
 package com.tiy.webapp;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -88,6 +90,9 @@ public class Event {
     }
 
     public void setStartTime(Timestamp startTime) {
+        if (startTime.after(endTime)) {
+            throw new AssertionError("Start time cannot be after end time.");
+        }
         this.startTime = startTime;
     }
 
@@ -96,6 +101,10 @@ public class Event {
     }
 
     public void setEndTime(Timestamp endTime) {
+        if (endTime.before(startTime)) {
+            throw new AssertionError("End time cannot be before start time.");
+            //what do you think this is, the land before time?
+        }
         this.endTime = endTime;
     }
 
@@ -103,9 +112,29 @@ public class Event {
      *
      * @return true if the current time is within an hour of the event's start time or end time.
      */
+    public boolean isActive () {
+        Timestamp now = Timestamp.valueOf(LocalDateTime.now());
+        long endTimePlusOneHour = this.endTime.getTime() + MILLIS_TO_HOURS;
+        if (now.getTime() > endTimePlusOneHour) {
+            return false;
+        }
+        long startTimeMinusOneHour = this.startTime.getTime() - MILLIS_TO_HOURS;
+        if (now.getTime() < startTimeMinusOneHour) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     *
+     * @return true if the event's end time is after the current time (the event is not over yet.
+     * Does not need to have started - the event can be starting a week from now and it is still "current").
+     */
     public boolean isCurrent () {
         Timestamp now = Timestamp.valueOf(LocalDateTime.now());
-        //if (now.after(this.endTime))
-        return false;
+        if (now.after(this.endTime)) {
+            return false;
+        }
+        return true;
     }
 }
