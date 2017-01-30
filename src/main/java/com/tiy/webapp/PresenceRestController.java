@@ -231,14 +231,16 @@ public class PresenceRestController {
         return outgoingRequests;
     }
 
-    @RequestMapping(path = "/toggle-photo-visible.json", method = RequestMethod.POST)
-    public Response togglePhotoVisible (@RequestBody DumbEmailWrapper wrapper) {
+    @RequestMapping(path = "/set-photo-visibility.json", method = RequestMethod.POST)
+    public Response setPhotoVisibility (@RequestBody SetPhotoVisibleRequest wrapper) {
+        initializeDb();
         User user = users.findFirstByEmail(wrapper.getEmail());
         if (user == null) {
             return new Response(false);
         }
-        user.setPhotoVisible(!user.getPhotoVisible());
-        return new Response(false);
+        user.setPhotoVisible(wrapper.getPhotoVisible());
+        users.save(user);
+        return new Response(true);
     }
 
     @RequestMapping(path = "/user-stale-requests-received.json", method = RequestMethod.POST)
