@@ -90,8 +90,10 @@ public class Event {
     }
 
     public void setStartTime(Timestamp startTime) {
-        if (startTime.after(endTime)) {
-            throw new AssertionError("Start time cannot be after end time.");
+        if (endTime != null) {
+            if (startTime.after(endTime)) {
+                throw new AssertionError("Start time cannot be after end time.");
+            }
         }
         this.startTime = startTime;
     }
@@ -101,9 +103,11 @@ public class Event {
     }
 
     public void setEndTime(Timestamp endTime) {
-        if (endTime.before(startTime)) {
-            throw new AssertionError("End time cannot be before start time.");
-            //what do you think this is, the land before time?
+        if (startTime != null) {
+            if (endTime.before(startTime)) {
+                throw new AssertionError("End time cannot be before start time.");
+                //what do you think this is, the land before time?
+            }
         }
         this.endTime = endTime;
     }
