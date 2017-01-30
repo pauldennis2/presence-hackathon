@@ -237,7 +237,7 @@ public class PresenceRestController {
         if (user == null) {
             return new Response(false);
         }
-        user.setPhotoVisible(!user.isPhotoVisible());
+        user.setPhotoVisible(!user.getPhotoVisible());
         return new Response(false);
     }
 
