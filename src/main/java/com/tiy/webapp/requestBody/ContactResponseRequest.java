@@ -1,4 +1,4 @@
-package com.tiy.webapp;
+package com.tiy.webapp.requestBody;
 
 
 /**

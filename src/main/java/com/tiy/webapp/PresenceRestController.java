@@ -1,5 +1,6 @@
 package com.tiy.webapp;
 
+import com.tiy.webapp.requestBody.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,8 +18,6 @@ import java.util.*;
 public class PresenceRestController {
 
     boolean dbInitialized = false;
-
-    int nextRequestId;
 
     public static final long MILLIS_TO_24HOURS = 86400000;
 
@@ -109,17 +108,18 @@ public class PresenceRestController {
     }
 
     @RequestMapping(path = "/send-request.json", method = RequestMethod.POST)
-    public Response sendRequest (@RequestBody UserContact userContact) {
+    //public Response sendRequest (@RequestBody UserContact userContact) {
+    public Response sendRequest(@RequestBody UserContactRequest userContactRequest) {
         initializeDb();
-        User requester = userContact.getRequester();
-        User requestee = userContact.getRequestee();
+        User requester = users.findFirstByEmail(userContactRequest.getRequesterEmail());
+        User requestee = users.findFirstByEmail(userContactRequest.getRequesteeEmail());
         if (requester == null || requestee == null) {
             return new Response(false);
         }
         if (requester.equals(requestee)) {
             return new Response(false);
         }
-        contacts.save(userContact);
+        contacts.save(new UserContact(requester, requestee, userContactRequest.getStatus()));
         return new Response(true);
     }
 
@@ -127,6 +127,27 @@ public class PresenceRestController {
     public Set<User> getEventAttendees (@RequestBody EventAttendeesRequest request) {
         initializeDb();
         return users.findByCheckedInEventId(request.getEventId());
+    }
+
+    /**
+     * param: must include the user trying to see the list of attendees
+     * @return the list of event attendees who haven't blocked the user
+     */
+    @RequestMapping(path = "/get-event-attendees-wblock.json", method = RequestMethod.POST)
+    public Set<User> getEventAttendeesBlock (@RequestBody EventAttendeesForUserRequest request) {
+        initializeDb();
+        String email = request.getEmail();
+        Long eventId = request.getEventId();
+        Set<User> attendees = users.findByCheckedInEventId(eventId);
+        for (User attendee : attendees) {
+            Set<UserContact> blocks = contacts.findByRequesterEmailAndStatus(attendee.getEmail(), ContactStatus.BLOCKED);
+            for (UserContact userContact : blocks) {
+                if (userContact.getRequestee().getEmail().equals(email)) {//If the person the block was about is the person
+                    attendees.remove(attendee);
+                }
+            }
+        }
+        return attendees;
     }
 
 
@@ -208,6 +229,16 @@ public class PresenceRestController {
             }
         }
         return outgoingRequests;
+    }
+
+    @RequestMapping(path = "/toggle-photo-visible.json", method = RequestMethod.POST)
+    public Response togglePhotoVisible (@RequestBody DumbEmailWrapper wrapper) {
+        User user = users.findFirstByEmail(wrapper.getEmail());
+        if (user == null) {
+            return new Response(false);
+        }
+        user.setPhotoVisible(!user.isPhotoVisible());
+        return new Response(false);
     }
 
     @RequestMapping(path = "/user-stale-requests-received.json", method = RequestMethod.POST)

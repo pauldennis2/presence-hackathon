@@ -2,10 +2,14 @@ package com.tiy.webapp;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.sql.Timestamp;
@@ -28,6 +32,9 @@ public class UserRepoTest {
     
     @Autowired
     ContactRepo contacts;
+
+    @Rule
+    public final ExpectedException expectedException = ExpectedException.none();
 
     User firstTestUser;
     User secondTestUser;
@@ -63,6 +70,19 @@ public class UserRepoTest {
         assertNull(firstNullUser);
         User secondNullUser = users.findFirstByEmail(secondTestUser.getEmail());
         assertNull(secondNullUser);
+    }
+
+    @Test
+    public void testEmailUniqueness () {
+        secondTestUser.setEmail(firstTestUser.getEmail());
+        users.save(firstTestUser);
+
+        expectedException.expect(DataIntegrityViolationException.class);
+        users.save(secondTestUser);
+
+        users.delete(firstTestUser);
+        User nullUser = users.findFirstByEmail(firstTestUser.getEmail());
+        assertNull(nullUser);
     }
 
     @Test

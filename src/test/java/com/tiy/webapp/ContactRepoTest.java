@@ -35,7 +35,6 @@ public class ContactRepoTest {
     public void setUp() throws Exception {
         user1 = new User("test1@gmail", "123", "456", "789", "CEO", "secret");
         user2 = new User("test2@gmail", "abc", "def", "jhi", "brd", "ubrs");
-        //firstContact = new UserContact(user1, user2, ContactStatus.REQUESTED);
         firstContact = new UserContact();
         firstContact.setRequester(user1);
         firstContact.setStatus(ContactStatus.FRIENDS);
@@ -48,33 +47,61 @@ public class ContactRepoTest {
     }
 
     @Test
+    public void testFindByStatus () {
+        users.save(user1);
+        users.save(user2);
+        UserContact savedContact = contacts.save(firstContact);
+        UserContact block1Contact = new UserContact(user1, user2, ContactStatus.BLOCKED);
+        UserContact block2Contact = new UserContact(user2, user1, ContactStatus.BLOCKED);
+        UserContact firstSavedBlockContact = contacts.save(block1Contact);
+        UserContact secondSavedBlockContact = contacts.save(block2Contact);
+        //Setup ^^^
+
+        int size = contacts.findByRequesterEmailAndStatus(user1.getEmail(), ContactStatus.BLOCKED).size();
+        assertEquals (1, size);
+
+
+
+        //Cleanup vvvvv
+        contacts.delete(savedContact.getId());
+        UserContact nullContact = contacts.findOne(savedContact.getId());
+        assertNull(nullContact);
+
+        contacts.delete(firstSavedBlockContact.getId());
+        contacts.delete(secondSavedBlockContact.getId());
+        nullContact = contacts.findOne(firstSavedBlockContact.getId());
+        assertNull(nullContact);
+        nullContact = contacts.findOne(secondSavedBlockContact.getId());
+        assertNull(nullContact);
+
+        users.delete(user1);
+        users.delete(user2);
+        User firstNullUser = users.findFirstByEmail(user1.getEmail());
+        User secondNullUser = users.findFirstByEmail(user2.getEmail());
+        assertNull(firstNullUser);
+        assertNull(secondNullUser);
+    }
+
+    @Test
     public void testBasicContactCrud () {
+        users.save(user1);
+        users.save(user2);
         UserContact savedContact = contacts.save(firstContact);
         Long id = savedContact.getId();
         UserContact retrievedContact = contacts.findOne(id);
         assertNotNull(retrievedContact);
-        //assertEquals(firstContact.getRequester().getEmail(), retrievedContact.getRequester().getEmail());
         assertEquals(firstContact.getStatus(), retrievedContact.getStatus());
         assertEquals(firstContact.getOriginalRequestTime(), retrievedContact.getOriginalRequestTime());
 
         contacts.delete(id);
-
         UserContact nullContact = contacts.findOne(id);
         assertNull(nullContact);
-    }
 
-    @Test
-    public void testSomething () {
-        users.save(user1);
-        UserContact savedContact = contacts.save(firstContact);
-        Long id = savedContact.getId();
-
-        UserContact retrievedContact = contacts.findOne(id);
-        assertNotNull(retrievedContact);
-        assertEquals(user1.getEmail(), retrievedContact.getRequester().getEmail());
-
-        contacts.delete(id);
-        retrievedContact = contacts.findOne(id);
-        assertNull(retrievedContact);
+        users.delete(user1);
+        users.delete(user2);
+        User firstNullUser = users.findFirstByEmail(user1.getEmail());
+        User secondNullUser = users.findFirstByEmail(user2.getEmail());
+        assertNull(firstNullUser);
+        assertNull(secondNullUser);
     }
 }

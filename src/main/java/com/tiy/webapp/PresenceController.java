@@ -27,7 +27,6 @@ public class PresenceController {
     }
 
     @RequestMapping(path = "/add-event", method = RequestMethod.POST)
-    //public String addEvent (String eventName, String location, String address, Date startDate, Time startTime, Date endDate, Time endTime) {
     public String addEvent (String eventName, String location, String address, String startDate, String startTime, String endDate, String endTime) {
         System.out.println("Event name = " + eventName);
         System.out.println("Location = " + location);
@@ -54,11 +53,7 @@ public class PresenceController {
 
         int endHour = Integer.parseInt(splitEndTime[0]);
         int endMinute = Integer.parseInt(splitEndTime[1]);
-        /*public static LocalDateTime of(int year,
-                               Month month,
-                               int dayOfMonth,
-                               int hour,
-                               int minute)*/
+
         LocalDateTime startDateTime = LocalDateTime.of(startYear, startMonth, startDay, startHour, startMinute);
         LocalDateTime endDateTime = LocalDateTime.of(endYear, endMonth, endDay, endHour, endMinute);
         System.out.println(startDateTime);
@@ -83,13 +78,4 @@ public class PresenceController {
         events.delete(eventId);
         return "redirect:/";
     }
-
-
-    /*@RequestMapping(path = "/add-game", method = RequestMethod.POST)
-    public String addGame(HttpSession session, String gameName, String gamePlatform, String gameGenre, int gameYear) {
-        User user = (User) session.getAttribute("user");
-        Game game = new Game(gameName, gamePlatform, gameGenre, gameYear, user);
-        games.save(game);
-        return "redirect:/";
-    }*/
 }

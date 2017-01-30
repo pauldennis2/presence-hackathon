@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 public class Event {
 
     public static long MILLIS_TO_HOURS = 3600000;
+    public static final long MILLIS_TO_24HOURS = 86400000;
 
     @Id
     @GeneratedValue
@@ -38,19 +39,12 @@ public class Event {
 
     }
 
-    public Event(Long id, String eventName, String location, String address) {
-        this.id = id;
-        this.eventName = eventName;
-        this.location = location;
-        this.address = address;
-        startTime = Timestamp.valueOf(LocalDateTime.now());
-    }
-
     public Event(String eventName, String location, String address) {
         this.eventName = eventName;
         this.location = location;
         this.address = address;
         startTime = Timestamp.valueOf(LocalDateTime.now());
+        endTime = new Timestamp(startTime.getTime() + MILLIS_TO_24HOURS);
     }
 
     public Long getId() {

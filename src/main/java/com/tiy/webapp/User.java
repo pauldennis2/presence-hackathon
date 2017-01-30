@@ -1,6 +1,7 @@
 package com.tiy.webapp;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -54,8 +55,11 @@ public class User {
     Set<Event> events;
 
     @Column(nullable = true)
-    @Lob
+    @Type(type = "text")
     String imageString;
+
+    @Column(nullable = true)
+    boolean photoVisible;
 
     public User () {
 
@@ -174,5 +178,13 @@ public class User {
 
     public void setIncomingRequests(Set<UserContact> incomingRequests) {
         this.incomingRequests = incomingRequests;
+    }
+
+    public boolean isPhotoVisible() {
+        return photoVisible;
+    }
+
+    public void setPhotoVisible(boolean photoVisible) {
+        this.photoVisible = photoVisible;
     }
 }

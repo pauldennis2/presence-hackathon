@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
 public class EventRepoTest {
 
     @Autowired
-    EventRepo eventRepo;
+    EventRepo events;
 
     Event testEvent;
     Event otherEvent;
@@ -26,7 +26,7 @@ public class EventRepoTest {
     @Before
     public void setUp() throws Exception {
         testEvent = new Event("Test Test Event", "TIY", "MLK");
-        otherEvent = new Event("Big Testing Party", "Norway", "Fjords");
+        otherEvent = new Event("Pining for the Fjords", "Norway", "Fjords");
     }
 
     @After
@@ -35,23 +35,28 @@ public class EventRepoTest {
 
     @Test
     public void testBasicEventCrud () {
-        Event savedEvent = eventRepo.save(testEvent);
-        Event otherSavedEvent = eventRepo.save(otherEvent);
+        Event savedEvent = events.save(testEvent);
+        Event otherSavedEvent = events.save(otherEvent);
         Long id = savedEvent.getId();
         Long id2 = otherSavedEvent.getId();
-        Event retrievedEvent = eventRepo.findOne(id);
-        Event otherRetrievedEvent = eventRepo.findOne(id2);
+        Event retrievedEvent = events.findOne(id);
+        Event otherRetrievedEvent = events.findOne(id2);
         assertNotNull(retrievedEvent);
         assertNotNull(otherRetrievedEvent);
         assertEquals(testEvent.getAddress(), retrievedEvent.getAddress());
         assertEquals(otherEvent.getStartTime(), otherRetrievedEvent.getStartTime());
         assertEquals(otherEvent.getAddress(), otherRetrievedEvent.getAddress());
 
-        eventRepo.delete(id);
-        eventRepo.delete(id2);
+        Event foundByEventName = events.findFirstByEventName("Pining for the Fjords");
+        Event notFound = events.findFirstByEventName("Just Pining Thanks");
+        assertNotNull(foundByEventName);
+        assertNull(notFound);
 
-        Event nullEvent1 = eventRepo.findOne(id);
-        Event nullEvent2 = eventRepo.findOne(id2);
+        events.delete(id);
+        events.delete(id2);
+
+        Event nullEvent1 = events.findOne(id);
+        Event nullEvent2 = events.findOne(id2);
         assertNull(nullEvent1);
         assertNull(nullEvent2);
     }
