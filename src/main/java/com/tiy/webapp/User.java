@@ -59,7 +59,7 @@ public class User {
     String imageString;
 
     @Column(nullable = true)
-    boolean photoVisible;
+    Boolean photoVisible;
 
     public User () {
 
