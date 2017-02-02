@@ -85,7 +85,7 @@ public class UserContact {
         return requester;
     }
 
-    public void setRequester(User requester) throws Exception {
+    public void setRequester(User requester) {
         this.requester = requester;
     }
 

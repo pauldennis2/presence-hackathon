@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 /**
  * Created by Paul Dennis on 1/25/2017.
@@ -35,6 +36,23 @@ public class Event {
     @Column(nullable = false)
     Timestamp endTime;
 
+    /*@ManyToMany
+    @JoinTable (
+            name = "user_events",
+            joinColumns = @JoinColumn(name="user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "event_id", referencedColumnName = "id")
+    )
+    Set<Event> events;*/
+
+    @ManyToMany
+    @JoinTable (
+            name = "user_events",
+            joinColumns = @JoinColumn(name="event_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
+    )
+    Set<User> attendees;
+
+
     public Event () {
 
     }
@@ -45,6 +63,14 @@ public class Event {
         this.address = address;
         startTime = Timestamp.valueOf(LocalDateTime.now());
         endTime = new Timestamp(startTime.getTime() + MILLIS_TO_24HOURS);
+    }
+
+    public void setStartAndEndTime (Timestamp startTime, Timestamp endTime) {
+        if (startTime.after(endTime)) {
+            throw new AssertionError("Start time cannot be after end time");
+        }
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 
     public Long getId() {
@@ -134,5 +160,9 @@ public class Event {
             return false;
         }
         return true;
+    }
+
+    public int getNumAttendees () {
+        return attendees.size();
     }
 }

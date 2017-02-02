@@ -1,0 +1,16 @@
+<div width="50%">
+    Event List:<br>
+    Event Name    Location    Address <span class="badge">Attendees</span>
+    <ul class="list-group">
+        <button type="button" class="list-group-item" ng-repeat="event in eventList" ng-click="getAttendees(event.id)" data-toggle="collapse" data-target="#demo">
+            {{event.eventName}} at {{event.location}} ({{event.address}})
+            <span class="badge">{{event.numAttendees}}</span>
+        </button>
+    </ul>
+    Event Attendees:
+    <ul>
+        <li ng-repeat="user in userList">
+            {{user.firstName}} {{user.lastName}}
+        </li>
+    </ul>
+</div>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="spaApp">
+<head>
+    <meta charset="UTF-8">
+    <title>Presence App Events</title>
+
+    <script src="js/angular.min.js"></script>
+    <script src="js/angular-route.min.js"></script>
+    <script src="js/spa.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+<body ng-controller="spaController">
+<div width="50%">
+    Event List:<br>
+    Event Name    Location    Address <span class="badge">Attendees</span>
+    <ul class="list-group">
+        <button type="button" class="list-group-item" ng-repeat="event in eventList" ng-click="getAttendees(event.id)" data-toggle="collapse" data-target="#demo">
+            {{event.eventName}} at {{event.location}} ({{event.address}})
+            <span class="badge">{{event.numAttendees}}</span>
+        </button>
+    </ul>
+</div>
+<div ng-view></div>
+
+</body>
+</html>

@@ -10,4 +10,6 @@ import java.util.Set;
 public interface ContactRepo extends CrudRepository<UserContact, Long> {
     //Set<UserContact> findByRequesterEmail(String requesterEmail);
 //    Set<UserContact> findByRequesterEmailAndStatus (String requesterEmail, ContactStatus status);
+
+    Set<UserContact> findByRequesterAndRequestee(User requester, User requestee);
 }

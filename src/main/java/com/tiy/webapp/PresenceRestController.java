@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -30,6 +32,14 @@ public class PresenceRestController {
     @Autowired
     ContactRepo contacts;
 
+    /*@Autowired
+    TestPersonRepo testPersons;
+
+    @RequestMapping(path = "/test-person-list.json", method = RequestMethod.GET)
+    public Iterable<TestPerson> testPersonList () {
+        return testPersons.findAll();
+    }*/
+
     //POC Endpoints
     @RequestMapping(path = "/user-login.json", method = RequestMethod.POST)
     public Response userLogin (@RequestBody UserLoginRequest userLoginRequest) {
@@ -41,6 +51,11 @@ public class PresenceRestController {
             }
         }
         return new Response(false);
+    }
+
+    @RequestMapping(path = "get-picture.json", method = RequestMethod.GET)
+    public ImageStringWrapper getPicture () {
+        return new ImageStringWrapper(getImageStringFromFile("narutowheader.txt"));
     }
 
     @RequestMapping(path = "/get-open-events.json", method = RequestMethod.GET)
@@ -336,9 +351,13 @@ public class PresenceRestController {
     public void initializeUsers () {
         User user1 = users.findFirstByEmail("paul@gmail");
         User user2 = users.findFirstByEmail("adrian@gmail");
+        User user3 = users.findFirstByEmail("tomselleck@gmail");
+        User user4 = users.findFirstByEmail("tombrady@gmail");
+        User user5 = users.findFirstByEmail("tomholland@gmail");
         if (user1 == null) {
             user1 = new User("paul@gmail", "Paul", "Dennis", "TIY", "Student", "drifting3");
             user1.setPhotoVisible(false);
+            user1.setImageString(getImageStringFromFile("narutowheader.txt"));
             users.save(user1);
         }
         if (user2 == null) {
@@ -346,11 +365,29 @@ public class PresenceRestController {
             user2.setPhotoVisible(true);
             users.save(user2);
         }
+        if (user3 == null) {
+            user3 = new User("tomselleck@gmail", "Tom", "Selleck", "Television", "Actor", "mustache");
+            user3.setPhotoVisible(true);
+            users.save(user3);
+        }
+        if (user4 == null) {
+            user4 = new User("tombrady@gmail", "Tom", "Brady", "Patriots", "Cheater", "deflate");
+            user4.setPhotoVisible(false);
+            users.save(user4);
+        }
+        if (user5 == null) {
+            user5 = new User("tomholland@gmail", "Tom", "Holland", "Hollywood", "Spiderman", "secret");
+            user5.setPhotoVisible(true);
+            user5.setImageString(getImageStringFromFile("muy_guapo.txt"));
+            users.save(user5);
+        }
     }
 
     public void initializeEvents () {
         Event event1 = events.findFirstByEventName("Big Test Party");
         Event event2 = events.findFirstByEventName("Giant Test Luau");
+        Event event3 = events.findFirstByEventName("Likely Trump Impeachment");
+        Event event4 = events.findFirstByEventName("Paul's Birthday");
         Timestamp tomorrow = Timestamp.valueOf(LocalDateTime.now());
         tomorrow.setTime(tomorrow.getTime() + MILLIS_TO_24HOURS);
         if (event1 == null) {
@@ -363,14 +400,74 @@ public class PresenceRestController {
             event2.setEndTime(tomorrow);
             events.save(event2);
         }
+        if (event3 == null) {
+            event3 = new Event("Likely Trump Impeachment", "White House", "Pennsylvania Av");
+            event3.setEndTime(tomorrow);
+            events.save(event3);
+        }
+        if (event4 == null) {
+            event4 = new Event("Paul's Birthday", "Paul's Place", "Midtown");
+            event4.setStartAndEndTime(new Timestamp(1493560800000L), new Timestamp(1495560800000L));
+            events.save(event4);
+        }
+        initializeAttendees();
+    }
+
+    public void initializeAttendees() {
+        User user1 = users.findFirstByEmail("paul@gmail");
+        User user2 = users.findFirstByEmail("adrian@gmail");
+        User user3 = users.findFirstByEmail("tomselleck@gmail");
+        User user4 = users.findFirstByEmail("tombrady@gmail");
+        User user5 = users.findFirstByEmail("tomholland@gmail");
+
+        //Event event1 = events.findFirstByEventName("Big Test Party");
+        Event event2 = events.findFirstByEventName("Giant Test Luau");
+        Event event3 = events.findFirstByEventName("Likely Trump Impeachment");
+        Event event4 = events.findFirstByEventName("Paul's Birthday");
+
+        user1.eventCheckIn(event4);
+        user2.eventCheckIn(event4);
+        user3.eventCheckIn(event2);
+        //Tom Brady is not invited
+        user5.eventCheckIn(event4);
+        user4.eventCheckIn(event3);
     }
 
     public void initializeContacts () {
+        User paul = users.findFirstByEmail("paul@gmail");
         if (contacts.count() == 0) {
-            User user1 = users.findFirstByEmail("paul@gmail");
             User user2 = users.findFirstByEmail("adrian@gmail");
-            UserContact userContact = new UserContact(user1, user2, ContactStatus.REQUESTED);
+            UserContact userContact = new UserContact(paul, user2, ContactStatus.REQUESTED);
             contacts.save(userContact);
+        }
+        User tom = users.findFirstByEmail("tomholland@gmail");
+        User adrian = users.findFirstByEmail("adrian@gmail");
+        Set<UserContact> userContactSet = contacts.findByRequesterAndRequestee(tom, paul);
+        if (userContactSet.size() == 0) {
+            UserContact bffs = new UserContact();
+            bffs.setRequester(tom);
+            bffs.setRequestee(paul);
+            bffs.setStatus(ContactStatus.FRIENDS);
+            contacts.save(bffs);
+        }
+        Set<UserContact> userContactSet1 = contacts.findByRequesterAndRequestee(paul, adrian);
+        if (userContactSet1.size() == 0) {
+            UserContact teamMates = new UserContact();
+            teamMates.setRequester(paul);
+            teamMates.setRequestee(adrian);
+            teamMates.setStatus(ContactStatus.FRIENDS);
+            contacts.save(teamMates);
+        }
+    }
+
+    public String getImageStringFromFile (String fileName) {
+        try {
+            String content = new Scanner(new File(fileName)).useDelimiter("\\Z").next();
+            System.out.println("Content length: " + content.length());
+            return content;
+        } catch (FileNotFoundException exception) {
+            System.out.println("Unable to read file with exception: " + exception.getMessage());
+            return null;
         }
     }
 }

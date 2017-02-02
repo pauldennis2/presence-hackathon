@@ -109,6 +109,9 @@ public class User {
 
     public void eventCheckIn (Event event) {
         setCheckedInEventId(event.getId());
+        if (events == null) {
+            events = new HashSet<>();
+        }
         events.add(event);
     }
 

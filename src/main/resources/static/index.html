@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="testApp">
+<head>
+    <meta charset="UTF-8">
+    <title>AngularJS Routing Baseline</title>
+    <script src="js/angular.min.js"></script>
+    <script src="js/angular-route.min.js"></script>
+    <script src="js/routing-test.js"></script>
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="../css/test-styles.css">
+
+</head>
+<body ng-controller="testController">
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#/">Angular Routing Baseline</a>
+        </div>
+        <ul class="nav navbar-nav">
+            <li>
+                <a href="#/">Go Home</a>
+            </li>
+            <li>
+                <a href="#test2">Go to Test 2</a>
+            </li>
+            <li>
+                <a href="#test3">Go to Test 3</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="test-title">
+    <h2>{{testVar}}</h2>
+    <h3>{{testGlobalValue}}</h3>
+    <ul>
+        <li ng-repeat="testItem in testItemList">
+            {{testItem.firstName}} {{testItem.lastName}} is a {{testItem.profession}}
+        </li>
+    </ul>
+</div>
+<div ng-view></div>
+
+</body>
+</html>
